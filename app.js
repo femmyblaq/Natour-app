@@ -1,45 +1,27 @@
-const fs = require("fs");
 const express = require("express");
+const morgan = require("morgan");
+const tourRouter = require("./routes/tourRouter");
+const userRouter = require("./routes/userRouter");
 const app = express();
 app.use(express.json());
+app.use(morgan("dev"));
 
-app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({ message: "Hello from the server side", app: "Natours" });
-});
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tour-simple.json`)
-);
+// app.get("/", (req, res) => {
+//   res
+//     .status(200)
+//     .json({ message: "Hello from the server side", app: "Natours" });
+// });
 
-app.get("/api/v1/tours", (req, res) => {
-  res.status(200).json({
-    message: "sucess",
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
+// app.get("/api/v1/tours", getAllTours);
+// app.get("/api/v1/tours/:id", getTours);
 
-app.post("/api/v1/tours", (req, res) => {
-  const newTourId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newTourId }, req.body);
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tour-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        message: "sucessful",
-        data: {
-          tours: newTour,
-        },
-      });
-    }
-  );
-});
+// app.patch("/api/v1/tours/:id", updatedTour);
 
-const port = 3000;
+// app.delete("/api/v1/tours/:id", deleteTour);
 
-app.listen(port, () => console.log(`Server running at port ${port}`));
+// app.post("/api/v1/tours", createTours);
+app.use("/api/v1/tours", tourRouter);
+
+app.use("/api/v1/users", userRouter);
+
+module.exports = app;
